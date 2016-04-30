@@ -1,0 +1,211 @@
+X server:
+
+For having GUI on your system you need to install X server and it can be installed on system by following command (although you are not forced to install all members of this group package):
+
+sudo pacman -S xorg
+
+ 
+
+Installing Desktop:
+
+After installing X server you need a Desktop Enviroment or a Windows manager to do your works with that!
+Note: Installing Extra group packages is optional!
+
+Gnome Shell:
+
+sudo pacman -S gnome gnome-extra
+
+Cinnamon:
+
+sudo pacman -S cinnamon nemo-fileroller
+
+XFCE:
+
+sudo pacman -S xfce4 xfce4-goodies
+
+KDE:
+
+sudo pacman -S plasma
+
+I3wm:
+
+sudo pacman -S i3
+
+Openbox:
+
+sudo pacman -S openbox obconf
+
+Mate:
+
+sudo pacman -S mate mate-extra
+
+ 
+
+Display manager:
+
+There are lot of Display manager to use such as XDM, slim and etc but my favorite one is LightDM because it’s fast and really customizable.
+
+Note:some desktops such as Gnome Shell and etc has their own Display Manager then you won’t need LightDM anymore!
+
+for installing this Display manager use following command:
+
+sudo pacman -S lightdm lightdm-gtk-greeter
+
+You can install following package to be able to customize your LightDM by a graphical application:
+
+sudo pacman -S lightdm-gtk-greeter-settings
+
+If you llike to have other greeters on your Arch Linux you can use this command to check available:
+
+pacman -Ss greeter
+
+After you installed your favorite greeter you can go to /etc/lightdm/lightdm.conf and change it’s greeter, so put the name of your greeter in front of this line in that configuration text file:
+
+sudo nano /etc/lightdm/lightdm.conf
+
+[Seat:*]
+...
+greeter-session=lightdm-yourgreeter-greeter
+
+Now enable the service:
+
+sudo systemctl enable lightdm
+
+Bluetooth:
+
+For bluetooth you need to install some packages and start Bluetooth service, enter following command in Terminal to install packages:
+
+sudo pacman -S bluez blueman bluez-utils
+
+Now start btusb module:
+
+modeprobe btusb
+
+Enable and Start bluetooth service:
+
+sudo systemctl enable bluetooth && sudo systemctl start bluetooth
+
+Done!
+
+AUR Repo:
+
+Some of packages such as Kazam, i3blocks and etc can’t be find in Main repositories so we should install them from AUR and for do as well we need to add AUR address at the end of /etc/pacman.conf file.
+
+First open this file with nano editor:
+
+sudo nano /etc/pacman.conf
+
+Now add these lines at the very bottom of file:
+
+[archlinuxfr]
+SigLevel = Never
+Server = http://repo.archlinux.fr/$arch
+
+Now save the changes and update and upgrade your system by following code:
+
+sudo pacman -Syu
+
+Yaourt is the tool which let users to download and install packages from unofficial repository so install this tool by following command:
+
+sudo pacman -S yaourt
+
+Test Yaourt, for doing this you just need to install a package with that as an example install Kazam package with that:
+
+yaourt -S kazam
+
+Note: Users shouldn’t use sudo while they are using yaourt command.
+
+ 
+
+Remove beep sound:
+
+After we installed Arch Linux sometimes we hear some beep sound which related to a special module which we should blacklist it, as an example this sound will be heard when you push Backspace buttom while there are nothing to remove, now for blacklisting the sound we should do following steps:
+
+First users should make a directory:
+
+sudo mkdir /etc/modeprobe.d
+
+Make a empty text file in that:
+
+sudo touch /etc/modeprobe.d/pcbeep.conf
+
+Now open that file and put this line in that:
+
+blacklist pcspkr
+
+Reboot and enjoy your system! you won’t be bothered anymore with that sound.
+
+reboot
+
+ 
+
+Network:
+
+We need some packages and some other configuration to have Wifi and ethernet on our Arch Linux so install following packages:
+
+sudo pacman -S dialog wpa_actiond ifplugd wpa_supplicant
+
+At this point you should check your interface name with ip link output:
+
+ip link
+
+Output:
+
+[hossein@ArchLinux ~]$ ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: enp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 68:f7:28:cf:67:c3 brd ff:ff:ff:ff:ff:ff
+3: wlp3s0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc mq state DOWN mode DORMANT group default qlen 1000
+    link/ether 34:e6:ad:f1:0b:8f brd ff:ff:ff:ff:ff:ff
+
+So as you see mine is enp2s0 so I should enter following commands in my terminal(you have to replace your interface name with mine in commands!):
+
+sudo systemctl enable dhcpcd && sudo systemctl start dhcpcd
+
+sudo systemctl enable dhcpcd@enp2s0 && sudo systemctl start dhcpcd@enp2s0
+
+Do this also for wireless interface name:
+
+sudo systemctl enable dhcpcd@wlp3s0 && sudo systemctl start dhcpcd@wlp3s0
+
+You should also enable dhclient service, enter following commands:
+
+sudo systemctl enable dhclient && sudo systemctl start dhclient
+
+sudo systemctl enable dhclient@enp2s0 && sudo systemctl start dhclient@enp2s0
+
+sudo systemctl enable dhclient@wlp3s0 && sudo systemctl start dhclient@wlp3s0
+
+The last service you should start and enable is NetworkManager so enter this command:
+
+sudo systemctl start NetworkManager.service && sudo systemctl enable NetworkManager.service
+
+Users also can install a applet to manage their network:
+
+sudo pacman -S network-manager-applet
+
+This applet can be run by:
+
+nm-applet
+
+Or you can put it in your desktop menu 🙂
+
+ 
+
+Sound Server:
+
+Next thing that a user need is sound, you just need some packages to have sound so install following packages:
+
+sudo pacman -S pavucontrol alsa-firmware alsa-utils alsa-plugins pulseaudio-alsa pulseaudio
+
+Note: This commad install Alsa and Pulseaudio together!
+Now you can either use pavucontrol or alsamixer command in terminal to choose sound card!
+
+ 
+
+Optional Packages:
+
+This step is not necessary to pass but if you like enter following command to install some optional packages like firefox, ffmpeg, touchpad driver, gedit and etc:
+
+sudo pacman -S firefox vlc xf86-input-synaptics gedit ffmpeg unzip thunar 
